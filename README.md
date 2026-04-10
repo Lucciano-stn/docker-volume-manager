@@ -67,17 +67,17 @@ Pour les fonctionnalités distantes SFTP : `sftp`
 ## Installation
 
 ```bash
-# Créer la structure
-sudo mkdir -p /opt/docker/newbackups/{archive,log,script}
+# Créer la structure, par exemple :
+sudo mkdir -p /opt/docker/backups/{archive,log,script}
 
 # Copier les fichiers
-sudo cp docker-volume-manager.sh /opt/docker/newbackups/script/
-sudo cp .env /opt/docker/newbackups/script/
-sudo cp exclude.txt /opt/docker/newbackups/script/
+sudo cp docker-volume-manager.sh /opt/docker/backups/script/
+sudo cp exemple.env /opt/docker/backups/script/.env
+sudo cp exclude.txt /opt/docker/backups/script/
 
 # Permissions
-sudo chmod +x /opt/docker/newbackups/script/docker-volume-manager.sh
-sudo chown -R root:root /opt/docker/newbackups/
+sudo chmod +x /opt/docker/backups/script/docker-volume-manager.sh
+sudo chown -R root:root /opt/docker/backups/
 ```
 
 ## Fichier de configuration
