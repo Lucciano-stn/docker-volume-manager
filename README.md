@@ -87,11 +87,10 @@ Le fichier `.env` doit être présent dans le dossier `script/`.
 **Exemple de configuration :**
 
 ```bash
-BACKUP_DIR="/opt/docker/newbackups/archive"
-EXCLUDE_FILE="/opt/docker/newbackups/script/exclude.txt"
+BACKUP_DIR="/opt/docker/backups/archive"
+EXCLUDE_FILE="/opt/docker/backups/script/exclude.txt"
 
-BACKUP_LOG_FILE="/opt/docker/newbackups/log/backup.log"
-RESTORE_LOG_FILE="/opt/docker/newbackups/log/restore.log"
+BACKUP_LOG_FILE="/opt/docker/backups/log/backup.log"
 LOG_MAX_SIZE_MB=10
 LOG_MAX_ROTATE=5
 
@@ -106,11 +105,11 @@ KEEP_LOCAL_BACKUP=true
 REMOTE_ENABLED=true
 REMOTE_METHOD="sftp"
 
-SFTP_HOST="10.0.243.157"
+SFTP_HOST="10.10.10.10"
 SFTP_PORT=22
 SFTP_USER="backupdocker"
-SFTP_REMOTE_DIR="/docker-fixe-01"
-SFTP_SSH_KEY="/root/.ssh/id_ed25519"
+SFTP_REMOTE_DIR="/docker-backup-01"
+SFTP_SSH_KEY="/root/.ssh/id_ed255"
 SFTP_TIMEOUT=30
 ```
 
