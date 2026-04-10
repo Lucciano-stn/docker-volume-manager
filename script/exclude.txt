@@ -1,0 +1,5 @@
+temp_
+cache_
+.*backup.*
+logs_
+tmp_
