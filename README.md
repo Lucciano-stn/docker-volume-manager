@@ -87,30 +87,48 @@ Le fichier `.env` doit être présent dans le dossier `script/`.
 **Exemple de configuration :**
 
 ```bash
+# ==============================
+# Répertoires
+# ==============================
 BACKUP_DIR="/opt/docker/backups/archive"
 EXCLUDE_FILE="/opt/docker/backups/script/exclude.txt"
 
+# ==============================
+# Logs
+# ==============================
 BACKUP_LOG_FILE="/opt/docker/backups/log/backup.log"
 LOG_MAX_SIZE_MB=10
 LOG_MAX_ROTATE=5
 
-LOCAL_RETENTION_DAYS=3
-SFTP_RETENTION_DAYS=15
+# ==============================
+# Rétention
+# ==============================
+LOCAL_RETENTION_DAYS=2
 
+# ==============================
+# Backup
+# ==============================
+KEEP_LOCAL_BACKUP=true         # true | false
 DATE_FORMAT="%Y%m%d_%H%M"
-DEFAULT_BACKUP_MODE="stop"
-DRY_RUN=false
-KEEP_LOCAL_BACKUP=true
+DEFAULT_BACKUP_MODE="stop"     # stop | hot
+DRY_RUN=false                  # true | false
 
-REMOTE_ENABLED=true
-REMOTE_METHOD="sftp"
+# ==============================
+# Remote générique
+# ==============================
+REMOTE_ENABLED=true            # true | false
+REMOTE_METHOD="sftp"           # sftp | none
 
+# ==============================
+# SFTP
+# ==============================
 SFTP_HOST="10.10.10.10"
 SFTP_PORT=22
 SFTP_USER="backupdocker"
 SFTP_REMOTE_DIR="/docker-backup-01"
-SFTP_SSH_KEY="/root/.ssh/id_ed255"
+SFTP_SSH_KEY="/root/.ssh/id_ed25519"
 SFTP_TIMEOUT=30
+SFTP_RETENTION_DAYS=5
 ```
 
 ## Gestion des exclusions
