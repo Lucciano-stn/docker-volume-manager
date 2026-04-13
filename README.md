@@ -71,9 +71,9 @@ Pour les fonctionnalités distantes SFTP : `sftp`
 sudo mkdir -p /opt/docker/backups/{archive,log,script}
 
 # Copier les fichiers
-sudo cp docker-volume-manager.sh /opt/docker/backups/script/
-sudo cp exemple.env /opt/docker/backups/script/.env
-sudo cp exclude.txt /opt/docker/backups/script/
+sudo cp docker-volume-manager/script/docker-volume-manager.sh /opt/docker/backups/script/
+sudo cp docker-volume-manager/script/exemple.env /opt/docker/backups/script/.env
+sudo cp docker-volume-manager/script/exclude.txt /opt/docker/backups/script/
 
 # Permissions
 sudo chmod +x /opt/docker/backups/script/docker-volume-manager.sh
