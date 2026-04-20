@@ -1,4 +1,3 @@
-
 #!/usr/bin/env bash
 # backup_volumes.sh - Backup / Restore Docker volumes
 #
