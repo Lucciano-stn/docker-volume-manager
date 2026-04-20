@@ -284,6 +284,125 @@ Le script applique plusieurs mécanismes de sécurité :
 # 4. Test de restauration
 ./docker-volume-manager.sh restore --volume test_restore --archive wiki_data_20260410_1200.tar.gz --source local --dry-run
 ```
+## Automatiser la sauvegarde avec systemd
+
+Le script peut être automatisé avec **systemd** en utilisant :
+
+- un **service** `oneshot` qui exécute la sauvegarde
+- un **timer** qui déclenche ce service tous les jours, par exemple à **05:00**
+
+Cette approche permet de :
+
+- planifier le backup sans passer par `cron`
+- centraliser les logs dans `journalctl`
+- superviser le résultat du dernier lancement
+- rejouer le backup au redémarrage si la machine était arrêtée à l’heure prévue
+
+---
+
+### Créer le service systemd
+
+Créer le fichier suivant :
+
+```bash
+/etc/systemd/system/docker-volume-manager.service
+```
+
+```bash
+[Unit]
+Description=Docker Volume Manager Backup Service
+After=network-online.target docker.service
+Wants=network-online.target
+Requires=docker.service
+
+[Service]
+Type=oneshot
+User=root
+Group=root
+WorkingDirectory=/opt/docker/backups/script
+ExecStart=/opt/docker/backups/script/docker-volume-manager.sh backup --all --hot
+StandardOutput=journal
+StandardError=journal
+RemainAfterExit=no
+TimeoutStartSec=12h
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Explication des paramètres principaux : 
+
+- Type=oneshot : le service exécute une action ponctuelle puis se termine
+- WorkingDirectory : répertoire de travail du script
+- ExecStart : commande exécutée par systemd
+- StandardOutput=journal et StandardError=journal : envoi des logs dans journalctl
+- TimeoutStartSec=12h : autorise une exécution longue si plusieurs volumes doivent être sauvegardés
+
+### Créer le timer 
+
+Créer le fichier suivant :
+
+```bash
+/etc/systemd/system/docker-volume-manager.timer
+```
+
+```bash
+[Unit]
+Description=Daily Docker Volume Manager Backup at 05:00
+
+[Timer]
+OnCalendar=*-*-* 05:00:00
+Persistent=true
+Unit=docker-volume-manager.service
+
+[Install]
+WantedBy=timers.target
+```
+
+Explication des paramètres principaux :
+- OnCalendar=*-*-* 05:00:00 : déclenchement tous les jours à 05:00
+- Persistent=true : si le serveur était éteint à 05:00, le lancement est rejoué au prochain démarrage
+- Unit=docker-volume-manager.service : le timer déclenche ce service
+
+### Recharger systemd
+
+Après création ou modification des fichiers .service et .timer, recharger la configuration systemd :
+
+```bash
+sudo systemctl daemon-reload
+```
+
+### Activer et démarrer le timer
+
+Activer le timer pour qu’il soit pris en compte au démarrage du serveur, puis le lancer immédiatement :
+```bash
+sudo systemctl enable --now docker-volume-manager.timer
+systemctl status docker-volume-manager.timer
+systemctl list-timers | grep docker-volume-manager
+```
+
+Pour désactiver le lancement automatique :
+```bash
+systemctl disable --now docker-volume-manager.timer
+```
+
+Avant d’attendre le prochain déclenchement automatique, il est recommandé de tester le service manuellement :
+```bash
+systemctl start docker-volume-manager.service
+systemctl status docker-volume-manager.service
+```
+
+Les logs du service sont accessibles via journalctl :
+```bash
+journalctl -u docker-volume-manager.service -n 100 --no-pager
+```
+
+Pour suivre les logs en temps réel :
+```bash
+journalctl -fu docker-volume-manager.service
+```
+
+---
 
 ## Limites actuelles
 
