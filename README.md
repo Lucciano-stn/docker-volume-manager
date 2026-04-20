@@ -381,11 +381,6 @@ systemctl status docker-volume-manager.timer
 systemctl list-timers | grep docker-volume-manager
 ```
 
-Pour désactiver le lancement automatique :
-```bash
-systemctl disable --now docker-volume-manager.timer
-```
-
 Avant d’attendre le prochain déclenchement automatique, il est recommandé de tester le service manuellement :
 ```bash
 systemctl start docker-volume-manager.service
@@ -402,6 +397,12 @@ Pour suivre les logs en temps réel :
 journalctl -fu docker-volume-manager.service
 ```
 
+### Desactiver la sauvegarde automatique 
+
+Pour désactiver le lancement automatique :
+```bash
+systemctl disable --now docker-volume-manager.timer
+```
 ---
 
 ## Limites actuelles
