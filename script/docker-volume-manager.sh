@@ -1,3 +1,4 @@
+
 #!/usr/bin/env bash
 # backup_volumes.sh - Backup / Restore Docker volumes
 #
@@ -1120,20 +1121,39 @@ print_summary() {
 # RUNNERS
 # =========================================================
 run_backup() {
+    local backup_failed=0
+
     log "🚀 Démarrage backup Docker"
     log "Configuration: mode=$BACKUP_MODE remote=$REMOTE_ENABLED method=$REMOTE_METHOD dry_run=$DRY_RUN retention-local=${LOCAL_RETENTION_DAYS}jrs retention-sftp=${SFTP_RETENTION_DAYS}jrs keep-local=$KEEP_LOCAL_BACKUP"
 
-    resolve_volumes_for_backup
+    resolve_volumes_for_backup || return 1
 
     for vol in "${VOLUMES[@]}"; do
-        backup_one_volume "$vol"
+        if ! backup_one_volume "$vol"; then
+            backup_failed=1
+        fi
         echo "---"
     done
 
-    cleanup_local_backups
-    cleanup_remote
+    if ! cleanup_local_backups; then
+        log "❌ Échec du nettoyage local"
+        backup_failed=1
+    fi
+
+    if ! cleanup_remote; then
+        log "❌ Échec du nettoyage remote"
+        backup_failed=1
+    fi
+
     print_summary
+
+    if [ "$backup_failed" -ne 0 ] || [ ${#FAILED_LOCAL_VOLUMES[@]} -gt 0 ] || [ ${#FAILED_REMOTE_VOLUMES[@]} -gt 0 ]; then
+        log "❌ TERMINÉ AVEC ERREURS"
+        return 1
+    fi
+
     log "✅ TERMINÉ"
+    return 0
 }
 
 run_restore() {
@@ -1205,15 +1225,19 @@ main() {
     case "$ACTION" in
         backup)
             run_backup
+            exit $?
             ;;
         restore)
             run_restore
+            exit $?
             ;;
         list-local)
             run_list_local
+            exit $?
             ;;
         list-sftp)
             run_list_sftp
+            exit $?
             ;;
     esac
 }
