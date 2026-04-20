@@ -381,6 +381,8 @@ systemctl status docker-volume-manager.timer
 systemctl list-timers | grep docker-volume-manager
 ```
 
+### Démarrer le service manuellement 
+
 Avant d’attendre le prochain déclenchement automatique, il est recommandé de tester le service manuellement :
 ```bash
 systemctl start docker-volume-manager.service
