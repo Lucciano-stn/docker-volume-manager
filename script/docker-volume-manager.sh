@@ -439,8 +439,24 @@ validate_remote_config() {
             : "${SFTP_SSH_KEY:?Variable SFTP_SSH_KEY manquante}"
             : "${SFTP_TIMEOUT:?Variable SFTP_TIMEOUT manquante}"
 
-            if [ ! -f "$SFTP_SSH_KEY" ]; then
+           if [ ! -f "$SFTP_SSH_KEY" ]; then
                 echo "❌ Clé SSH SFTP introuvable: $SFTP_SSH_KEY"
+                echo "   Utilisateur courant : $(id -un)"
+                exit 2
+            fi
+			
+            if [ ! -f "$SFTP_SSH_KEY" ]; then
+                echo "❌ Le chemin SFTP_SSH_KEY n'est pas un fichier régulier: $SFTP_SSH_KEY"
+                exit 2
+            fi
+
+            if [ ! -r "$SFTP_SSH_KEY" ]; then
+                echo "❌ Clé SSH SFTP présente mais non lisible par l'utilisateur courant"
+                echo "   Clé               : $SFTP_SSH_KEY"
+                echo "   Utilisateur       : $(id -un)"
+                echo "   UID/GID            : $(id -u)/$(id -g)"
+                echo "   Permissions        : $(stat -c '%A %U:%G' "$SFTP_SSH_KEY" 2>/dev/null || echo 'inaccessibles')"
+                echo "   Conseil            : vérifier les droits sur la clé et ses répertoires parents"
                 exit 2
             fi
             ;;
